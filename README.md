@@ -10,7 +10,7 @@ Idea → running system in minutes: **architect** it with the diagrams, **descri
 
 ## The three moves
 
-1. **Architect** — open [`diagrams/`](diagrams/) and read [`ARCHITECT.md`](ARCHITECT.md). Learn the four-part chain, then run the *determinism gate* to confirm it's a fixed system and pick **scheduled vs event**.
+1. **Architect** — read [`ARCHITECT.md`](ARCHITECT.md). Learn the four-part chain, run the *determinism gate* to confirm it's a fixed system, and pick **scheduled vs event**. (When you build, Claude draws a board of *your* system — see `diagram.mjs` below.)
 2. **Design** — copy [`system-spec.template.md`](system-spec.template.md), fill it in (source · trigger · steps · action · verify). No code yet — this *is* the real work.
 3. **Build** — tell Claude Code: *"build the system in my spec."* [`CLAUDE.md`](CLAUDE.md) walks it through assembling the system from the primitives and deploying it.
 
@@ -30,7 +30,8 @@ Only the **trigger** changes between the two kinds of fixed system:
 
 | Path | What it is |
 |---|---|
-| [`diagrams/`](diagrams/) | The architecture, explained — Excalidraw (`.excalidraw` + `.png`) |
+| [`diagram.mjs`](diagram.mjs) | Draws an Excalidraw board of **your** system from its chain. Claude runs it during design, so you see your *own* architecture — not a generic board |
+| [`diagrams/`](diagrams/) | Where your generated system boards land (`example-system.excalidraw` shows the shape) |
 | [`ARCHITECT.md`](ARCHITECT.md) | The design workflow: the chain · the determinism gate · push-vs-pull · think → design → build → test |
 | [`system-spec.template.md`](system-spec.template.md) | The fill-in spec you write before building |
 | [`src/lib/verify.ts`](src/lib/verify.ts) | Prove a webhook is really from its source (Shopify HMAC, Telegram secret, generic) |

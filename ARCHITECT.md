@@ -2,7 +2,7 @@
 
 You don't start by coding. You start by *seeing the shape*. This is the whole design workflow — five minutes on paper saves an hour of rebuilding.
 
-Diagrams for each idea below live in [`diagrams/`](diagrams/). Open them.
+The ideas below are the *concepts*. When you build, Claude draws a board of **your specific system** (source → trigger → your steps → action) with `diagram.mjs` — open `diagrams/example-system.excalidraw` to see the shape it produces.
 
 ---
 
@@ -18,7 +18,6 @@ Source  →  Trigger  →  Engine  →  Action
 - **Action** — the outcome that lands in the real world (a message, a row, a doc, an email).
 
 Learn this once and it fits every automation you'll ever build.
-→ `diagrams/the-four-part-chain.png`
 
 ---
 
@@ -51,8 +50,6 @@ The trigger is the whole difference between the two kinds of fixed system.
 
 The listening cue: if you'd say **"every…"** it's scheduled; if you'd say **"the moment…"** or **"whenever…"** it's event-triggered.
 
-→ `diagrams/scheduled-vs-event.png`
-
 **No webhook on the source?** (e.g. you want competitor prices, or Gmail.) Then it's a **pull** — poll it on a **schedule** with a saved cursor. A webhook is just one transport; the real axis is push vs pull.
 
 ---
@@ -65,8 +62,6 @@ Every system, same four moves.
 2. **Design** — map the chain on paper: source → trigger → each step → action. Fill [`system-spec.template.md`](system-spec.template.md). *No building yet.* This is the real work.
 3. **Build** — hand the spec to Claude Code. Plan quality **is** build quality.
 4. **Test** — fire it once on purpose and watch every step land. Not done until you've seen it run end to end — and confirmed it doesn't double-fire.
-
-→ `diagrams/the-build-lifecycle.png`
 
 ---
 

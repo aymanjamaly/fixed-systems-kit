@@ -8,20 +8,22 @@ You are building **fixed (deterministic) systems** on Trigger.dev from a student
 
 2. **Run the determinism gate.** If the "steps" require judgment that changes the action per input in a way that can't be written as a rule, **stop and say so** — that's an agentic system, not a fixed one, and this kit is the wrong tool. Otherwise continue.
 
-3. **Pick the pattern from the trigger:**
+3. **Draw their system** — before writing code. Import `systemBoard` from `diagram.mjs` and call it with their chain (`{ name, triggerType, source, steps, action, verify }`) to write `diagrams/<system>.excalidraw`. The student opens it to see a diagram of **their own** system. It doubles as a design check: if the chain won't draw cleanly, the spec isn't finished. **Never hand them the kit's own diagrams — generate one for their system.**
+
+4. **Pick the pattern from the trigger:**
    - **Scheduled** → copy `src/trigger/scheduled.template.ts`. Set the `cron`. No receiver needed.
    - **Event-triggered** → copy **two** files:
      - the task: `src/trigger/task.template.ts`
      - the receiver: `app/api/webhooks/source.route.template.ts` → `app/api/webhooks/<source>/route.ts`
 
-4. **Wire the pieces** (in this order):
+5. **Wire the pieces** (in this order):
    - **Verify** (event only): use the matching verifier from `src/lib/verify.ts` in the receiver. Never process an unverified webhook. If the source isn't covered, use `verifyHmac` (generic) or add a small verifier beside the others.
    - **Payload**: the receiver reads the **raw body**, verifies, parses, then calls `tasks.trigger("<task-id>", payload, { idempotencyKey })`. Keep the payload minimal — send what the task needs, not the whole blob.
    - **Idempotency**: derive `idempotencyKey` from a stable ID in the payload (order id, message id, booking id). This is non-negotiable — sources retry.
    - **Steps**: implement the student's steps, in order, inside the task's `run`. One responsibility per helper.
    - **Action**: use `src/lib/actions.ts` (`notifySlack`, `sendTelegram`, `writeNotion`, `sendEmail`). Add a new action there if needed — don't inline it in the task.
 
-5. **Deploy + test** (see "Definition of done").
+6. **Deploy + test** (see "Definition of done").
 
 ## Hard rules
 
