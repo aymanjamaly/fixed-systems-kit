@@ -6,14 +6,14 @@ import type { telegramCapture } from "./task";
 // RECEIVER. When deploying, this goes to app/api/webhooks/telegram/route.ts
 // (the path becomes the URL you point Telegram's setWebhook at).
 export async function POST(req: NextRequest) {
-  const raw = await req.text();
+  const raw = Buffer.from(await req.arrayBuffer());
 
-  // VERIFY — Telegram echoes the secret you gave setWebhook in this header.
+  // VERIFY — Telegram echoes the secret you gave setWebhook in this header (no body hash).
   if (!verifyTelegram(req.headers.get("x-telegram-bot-api-secret-token"), process.env.TELEGRAM_SECRET_TOKEN ?? "")) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const update = JSON.parse(raw);
+  const update = JSON.parse(raw.toString("utf8"));
   const msg = update.message;
   if (!msg?.text) return NextResponse.json({ received: true }); // ignore non-text updates
 

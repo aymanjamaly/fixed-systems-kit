@@ -1,20 +1,17 @@
 import { task } from "@trigger.dev/sdk";
-import { notifySlack } from "../lib/actions";
+import { notifySlack } from "@/src/lib/actions";
 
 // EVENT task — the engine. The receiver triggers it via
 // tasks.trigger("event-template", payload, { idempotencyKey }).
-// It runs your steps, in order, and lands the action. It does NOT know or care
-// which source fired it — it just gets a payload.
+//
+// ⚠️ TEMPLATE. Copy this into `src/trigger/` (and rename) before use. It does not
+//    register as a task while it lives here in templates/ — that's deliberate.
 export const eventTemplate = task({
   id: "event-template",
   run: async (payload: any) => {
     // 1. STEPS — your engine, in order.
-    // const enriched = await step1(payload);
-    // const result = step2(enriched);
-
     // 2. ACTION — through actions.ts, never inline.
     await notifySlack(`Event handled: ${JSON.stringify(payload).slice(0, 200)}`);
-
     return { ok: true };
   },
 });

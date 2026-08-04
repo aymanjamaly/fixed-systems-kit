@@ -1,6 +1,6 @@
 # Examples — complete fixed systems
 
-Three working reference builds, one per shape. Read the one closest to what you're building, then copy the pattern.
+Three **reference** builds, one per shape — you **copy** them into place to run; they don't register as-is. Drop each `task.ts` into `src/trigger/`, and (for event examples) each `route.ts` into `app/api/webhooks/<source>/`. Each example's README has the exact steps. Read the one closest to what you're building.
 
 | Example | Shape | Teaches |
 |---|---|---|

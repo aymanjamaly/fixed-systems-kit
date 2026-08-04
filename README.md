@@ -36,10 +36,8 @@ Only the **trigger** changes between the two kinds of fixed system:
 | [`system-spec.template.md`](system-spec.template.md) | The fill-in spec you write before building |
 | [`src/lib/verify.ts`](src/lib/verify.ts) | Prove a webhook is really from its source (Shopify HMAC, Telegram secret, generic) |
 | [`src/lib/actions.ts`](src/lib/actions.ts) | Ready-made actions: Slack · Telegram · Notion · email |
-| [`src/trigger/scheduled.template.ts`](src/trigger/scheduled.template.ts) | The scheduled (cron) task pattern |
-| [`src/trigger/task.template.ts`](src/trigger/task.template.ts) | The event task pattern (with idempotency) |
-| [`app/api/webhooks/source.route.template.ts`](app/api/webhooks/source.route.template.ts) | The receiver pattern: verify → `tasks.trigger()` |
-| [`examples/`](examples/) | Complete working systems you can copy |
+| [`templates/`](templates/) | Copy-me patterns (kept **out** of the deploy path so they never register): scheduled task · event task · receiver route |
+| [`examples/`](examples/) | Three reference builds — **copy** them into `src/trigger/` and `app/` to run (each has a README) |
 
 ---
 

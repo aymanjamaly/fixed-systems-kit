@@ -11,10 +11,10 @@ You are building **fixed (deterministic) systems** on Trigger.dev from a student
 3. **Draw their system** — before writing code. Import `systemBoard` from `diagram.mjs` and call it with their chain (`{ name, triggerType, source, steps, action, verify }`) to write `diagrams/<system>.excalidraw`. The student opens it to see a diagram of **their own** system. It doubles as a design check: if the chain won't draw cleanly, the spec isn't finished. **Never hand them the kit's own diagrams — generate one for their system.**
 
 4. **Pick the pattern from the trigger:**
-   - **Scheduled** → copy `src/trigger/scheduled.template.ts`. Set the `cron`. No receiver needed.
+   - **Scheduled** → copy `templates/scheduled.template.ts` → `src/trigger/`. Set the `cron`. No receiver needed.
    - **Event-triggered** → copy **two** files:
-     - the task: `src/trigger/task.template.ts`
-     - the receiver: `app/api/webhooks/source.route.template.ts` → `app/api/webhooks/<source>/route.ts`
+     - the task: `templates/task.template.ts` → `src/trigger/`
+     - the receiver: `templates/receiver.route.template.ts` → `app/api/webhooks/<source>/route.ts`
 
 5. **Wire the pieces** (in this order):
    - **Verify** (event only): use the matching verifier from `src/lib/verify.ts` in the receiver. Never process an unverified webhook. If the source isn't covered, use `verifyHmac` (generic) or add a small verifier beside the others.

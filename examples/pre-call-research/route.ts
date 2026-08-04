@@ -5,14 +5,14 @@ import type { preCallResearch } from "./task";
 
 // RECEIVER for a Cal.com booking webhook. Deploy to app/api/webhooks/cal/route.ts.
 export async function POST(req: NextRequest) {
-  const raw = await req.text();
+  const raw = Buffer.from(await req.arrayBuffer());
 
   // VERIFY — Cal.com signs with your webhook secret (HMAC-SHA256, hex).
   if (!verifyHmac(raw, req.headers.get("x-cal-signature-256"), process.env.SOURCE_WEBHOOK_SECRET ?? "")) {
     return NextResponse.json({ error: "bad signature" }, { status: 401 });
   }
 
-  const evt = JSON.parse(raw);
+  const evt = JSON.parse(raw.toString("utf8"));
   const b = evt.payload ?? evt; // Cal.com nests the booking under `payload`
 
   await tasks.trigger<typeof preCallResearch>(
