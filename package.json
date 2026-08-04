@@ -1,25 +1,29 @@
 {
   "name": "fixed-systems-kit",
   "private": true,
-  "version": "1.0.0",
-  "description": "Architect, design, and build any fixed (deterministic) system on Trigger.dev — scheduled or event-triggered.",
+  "version": "2.0.0",
+  "description": "A tiny framework for fixed (deterministic) systems on Trigger.dev — one typed declaration wires the receiver, verification, idempotency, and task.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "trigger:dev": "trigger.dev dev",
     "trigger:deploy": "trigger.dev deploy",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@trigger.dev/sdk": "^4.0.0",
     "next": "^15.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "trigger.dev": "^4.0.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "vitest": "^2.0.0"
   }
 }

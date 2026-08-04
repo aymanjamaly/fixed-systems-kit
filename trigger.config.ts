@@ -2,7 +2,7 @@ import { defineConfig } from "@trigger.dev/sdk";
 
 export default defineConfig({
   project: "<your-trigger-project-ref>", // copy from the Trigger.dev dashboard
-  dirs: ["./src/trigger"],
+  dirs: ["./systems"], // every defineSystem() here deploys as a task
   retries: {
     enabledInDev: false,
     default: {

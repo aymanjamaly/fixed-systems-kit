@@ -1,64 +1,72 @@
 # Fixed Systems Kit
 
-Build **any fixed (deterministic) system** on [Trigger.dev](https://trigger.dev) — scheduled or event-triggered — fast, and actually understand what you built.
+A tiny framework for building **fixed (deterministic) systems** on [Trigger.dev](https://trigger.dev). One typed declaration wires the receiver, signature verification, idempotency, and the task — you write the steps.
 
-> A **fixed system** is one where *you* decide the steps and the system runs them. Same input → same steps, every time. It runs; it doesn't think. That's most of the automation a business needs — and this kit makes building it easy.
+```ts
+// systems/order-alert.ts
+import { defineSystem, shopify } from "@/src/framework";
+import { OrderSchema } from "./schemas";
 
-Idea → running system in minutes: **architect** it with the diagrams, **describe** it in a spec, let Claude **assemble** it from the primitives.
+export const orderAlert = defineSystem({
+  id: "order-alert",
+  trigger: shopify({ topic: "orders/create" }), // verify + idempotency, built in
+  input: OrderSchema,                            // zod: validates + types the payload
+  run: async (order, { actions }) => {           // `order` is fully typed
+    if (Number(order.total_price) >= 500) {
+      await actions.slack(`Large order #${order.order_number}`);
+    }
+  },
+});
+```
 
----
+That's the whole system. No route to write, no HMAC boilerplate, no idempotency key to remember.
 
-## The three moves
+## What one `defineSystem` gives you
 
-1. **Architect** — read [`ARCHITECT.md`](ARCHITECT.md). Learn the four-part chain, run the *determinism gate* to confirm it's a fixed system, and pick **scheduled vs event**. (When you build, Claude draws a board of *your* system — see `diagram.mjs` below.)
-2. **Design** — copy [`system-spec.template.md`](system-spec.template.md), fill it in (source · trigger · steps · action · verify). No code yet — this *is* the real work.
-3. **Build** — tell Claude Code: *"build the system in my spec."* [`CLAUDE.md`](CLAUDE.md) walks it through assembling the system from the primitives and deploying it.
+- **The receiver** — a single dynamic route (`app/api/webhooks/[system]/route.ts`) serves *every* event system. You never write a route.
+- **Verification** — each trigger carries its own signature/secret check, over the raw bytes.
+- **Idempotency** — each trigger knows its stable id; a retried delivery runs once.
+- **Validation + types** — `input` (zod) parses the payload; `run` receives typed, valid data or the request is rejected.
+- **Task registration** — deploys to Trigger.dev automatically.
 
-The chain every system in this kit follows:
+## Triggers
+
+| Trigger | Source | Verifies |
+|---|---|---|
+| `shopify({ topic })` | Shopify webhook | HMAC-SHA256 (base64) + topic |
+| `telegram()` | Telegram bot | secret token |
+| `cal()` | Cal.com booking | HMAC-SHA256 (hex) |
+| `webhook({ header, idField, secretEnv })` | any HMAC source | HMAC-SHA256 |
+| `schedule(cron)` | a clock (pull) | — |
+
+Adding a source = adding one builder in [`src/framework/triggers.ts`](src/framework/triggers.ts); every system that uses it gets verify + dedup for free.
+
+## Layout
 
 ```
-Source  →  Trigger  →  Engine (your steps, in order)  →  Action
+systems/            your systems (defineSystem) — each deploys as a Trigger.dev task
+src/framework/      the engine: defineSystem · triggers · receiver · verify · actions · registry
+app/api/webhooks/[system]/route.ts   one route for every event system
+tests/              vitest — verify · triggers · receiver
 ```
-
-Only the **trigger** changes between the two kinds of fixed system:
-- **Scheduled** — runs on a clock (a *pull*: you go get the data).
-- **Event-triggered** — runs when something happens (a *push*: a webhook lands).
-
----
-
-## What's inside
-
-| Path | What it is |
-|---|---|
-| [`diagram.mjs`](diagram.mjs) | Draws an Excalidraw board of **your** system from its chain. Claude runs it during design, so you see your *own* architecture — not a generic board |
-| [`diagrams/`](diagrams/) | Where your generated system boards land (`example-system.excalidraw` shows the shape) |
-| [`ARCHITECT.md`](ARCHITECT.md) | The design workflow: the chain · the determinism gate · push-vs-pull · think → design → build → test |
-| [`system-spec.template.md`](system-spec.template.md) | The fill-in spec you write before building |
-| [`src/lib/verify.ts`](src/lib/verify.ts) | Prove a webhook is really from its source (Shopify HMAC, Telegram secret, generic) |
-| [`src/lib/actions.ts`](src/lib/actions.ts) | Ready-made actions: Slack · Telegram · Notion · email |
-| [`templates/`](templates/) | Copy-me patterns (kept **out** of the deploy path so they never register): scheduled task · event task · receiver route |
-| [`examples/`](examples/) | Three reference builds — **copy** them into `src/trigger/` and `app/` to run (each has a README) |
-
----
 
 ## Quickstart
 
 ```bash
 npm install
-cp .env.example .env          # fill in TRIGGER_SECRET_KEY + any action/source secrets
-npx trigger.dev@latest dev    # run tasks locally
-npm run dev                   # run the Next.js receiver locally (for event systems)
+cp .env.example .env
+npm test          # the framework is tested
+npm run typecheck
+npx trigger.dev@latest dev   # run your systems locally
 ```
 
-Then follow the three moves above. When it works locally, deploy:
+**Add a system:** drop a file in `systems/`, export a `defineSystem(...)`, add it to `systems/index.ts`.
+**Deploy:** `npx trigger.dev@latest deploy` (tasks) + `vercel --prod` (receiver).
 
-```bash
-npx trigger.dev@latest deploy   # tasks → Trigger.dev
-vercel --prod                   # receiver → Vercel (event systems only)
-```
+Two real examples ship in [`systems/`](systems/): `order-alert` (Shopify event), `telegram-save` (Telegram event, fetches a page title), `hn-digest` (scheduled, posts Hacker News' top 5 — works with zero API keys).
 
----
+## Scope
 
-## The one rule
+Fixed systems only: *you* decide the steps, the system runs them. When the right action needs **judgment that changes per input** — a rule you can't write in advance — that's an **agentic** system, a different tool. Fixed is the default.
 
-**This kit builds FIXED systems only.** You decide the steps; the system runs them. The moment a step needs *judgment that changes the action per input* — where the rule can't be written in advance — that's an **agentic** system, a different tool. Run the determinism gate in [`ARCHITECT.md`](ARCHITECT.md) before you build. Fixed is the default; reach for agentic on purpose.
+MIT © Ayman Jamaly
